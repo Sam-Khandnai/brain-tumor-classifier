@@ -1,222 +1,453 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brain Tumor MRI Classifier</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:radial-gradient(circle at 20% 10%,rgba(108,99,255,.12),transparent 30%),radial-gradient(circle at 85% 80%,rgba(0,180,255,.08),transparent 30%),#050505;color:#f5f5f5;font-family:Inter,Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:30px}
-.container{width:min(1050px,100%)}
-.header{text-align:center;margin-bottom:25px}
-.eyebrow{color:#8d85ff;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
-h1{margin:0;font-size:clamp(28px,5vw,52px);letter-spacing:-1.5px}
-.subtitle{margin:10px auto 0;color:#8d8d8d;max-width:650px;line-height:1.6}
-.card{background:#101012;border:1px solid #29292d;border-radius:24px;padding:24px;box-shadow:0 20px 80px rgba(0,0,0,.45)}
-.upload-area{border:1.5px dashed #3c3c43;border-radius:18px;min-height:300px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;transition:.2s ease;overflow:hidden}
-.upload-area:hover{border-color:#7f5af0;background:rgba(127,90,240,.06)}
-.upload-content{padding:30px}
-.icon{width:58px;height:58px;border-radius:16px;background:#1c1b25;display:grid;place-items:center;margin:0 auto 16px;font-size:18px;font-weight:800}
-.upload-title{font-size:18px;font-weight:700}
-.upload-hint{color:#777;margin-top:8px;font-size:13px}
-#fileInput{display:none}
-#preview{display:none;max-width:100%;max-height:380px;object-fit:contain;border-radius:12px}
-.file-name{color:#8d85ff;margin-top:10px;font-size:13px;word-break:break-all}
-.actions{display:flex;gap:12px;margin-top:18px}
-button{border:0;border-radius:12px;padding:14px 20px;font-size:15px;font-weight:700;cursor:pointer}
-#predictBtn{flex:1;background:#7f5af0;color:#fff}
-#predictBtn:hover{background:#6d4ce0}
-#predictBtn:disabled{opacity:.45;cursor:not-allowed}
-#clearBtn{background:#1d1d20;color:#aaa;border:1px solid #303035}
-.status{color:#aaa;text-align:center;padding:16px}
-.error{display:none;color:#ff7777;background:rgba(255,80,80,.06);border:1px solid rgba(255,80,80,.2);border-radius:12px;padding:12px;margin-top:15px}
-.result{display:none;margin-top:20px;border-top:1px solid #29292d;padding-top:24px}
-.result-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:22px}
-.prediction-box{background:#0d0d0f;border:1px solid #25252a;border-radius:18px;padding:22px}
-.label{color:#777;font-size:12px;text-transform:uppercase;letter-spacing:1.2px}
-.prediction{font-size:30px;font-weight:800;margin-top:8px;text-transform:capitalize}
-.confidence{color:#8d85ff;font-size:18px;font-weight:700;margin-top:7px}
-.probability{margin-bottom:15px}
-.prob-head{display:flex;justify-content:space-between;margin-bottom:7px;font-size:13px;text-transform:capitalize}
-.bar-bg{height:9px;background:#242428;border-radius:999px;overflow:hidden}
-.bar{height:100%;width:0;background:linear-gradient(90deg,#6c63ff,#9b8cff);border-radius:inherit;transition:width .7s ease}
-.disclaimer{margin-top:18px;color:#666;font-size:11px;text-align:center;line-height:1.6}
-@media(max-width:700px){
-  body{padding:15px;align-items:flex-start}
-  .card{padding:15px}
-  .upload-area{min-height:220px}
-  .result-grid{grid-template-columns:1fr}
-  .prediction{font-size:26px}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brain Tumor MRI Classifier</title>
+  <style>
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 10%, rgba(108, 99, 255, .12), transparent 30%), radial-gradient(circle at 85% 80%, rgba(0, 180, 255, .08), transparent 30%), #050505;
+      color: #f5f5f5;
+      font-family: Inter, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px
+    }
+
+    .container {
+      width: min(1050px, 100%)
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 25px
+    }
+
+    .eyebrow {
+      color: #8d85ff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 52px);
+      letter-spacing: -1.5px
+    }
+
+    .subtitle {
+      margin: 10px auto 0;
+      color: #8d8d8d;
+      max-width: 650px;
+      line-height: 1.6
+    }
+
+    .card {
+      background: #101012;
+      border: 1px solid #29292d;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, .45)
+    }
+
+    .upload-area {
+      border: 1.5px dashed #3c3c43;
+      border-radius: 18px;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s ease;
+      overflow: hidden
+    }
+
+    .upload-area:hover {
+      border-color: #7f5af0;
+      background: rgba(127, 90, 240, .06)
+    }
+
+    .upload-content {
+      padding: 30px
+    }
+
+    .icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      background: #1c1b25;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 16px;
+      font-size: 18px;
+      font-weight: 800
+    }
+
+    .upload-title {
+      font-size: 18px;
+      font-weight: 700
+    }
+
+    .upload-hint {
+      color: #777;
+      margin-top: 8px;
+      font-size: 13px
+    }
+
+    #fileInput {
+      display: none
+    }
+
+    #preview {
+      display: none;
+      max-width: 100%;
+      max-height: 380px;
+      object-fit: contain;
+      border-radius: 12px
+    }
+
+    .file-name {
+      color: #8d85ff;
+      margin-top: 10px;
+      font-size: 13px;
+      word-break: break-all
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    #predictBtn {
+      flex: 1;
+      background: #7f5af0;
+      color: #fff
+    }
+
+    #predictBtn:hover {
+      background: #6d4ce0
+    }
+
+    #predictBtn:disabled {
+      opacity: .45;
+      cursor: not-allowed
+    }
+
+    #clearBtn {
+      background: #1d1d20;
+      color: #aaa;
+      border: 1px solid #303035
+    }
+
+    .status {
+      color: #aaa;
+      text-align: center;
+      padding: 16px
+    }
+
+    .error {
+      display: none;
+      color: #ff7777;
+      background: rgba(255, 80, 80, .06);
+      border: 1px solid rgba(255, 80, 80, .2);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 15px
+    }
+
+    .result {
+      display: none;
+      margin-top: 20px;
+      border-top: 1px solid #29292d;
+      padding-top: 24px
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 22px
+    }
+
+    .prediction-box {
+      background: #0d0d0f;
+      border: 1px solid #25252a;
+      border-radius: 18px;
+      padding: 22px
+    }
+
+    .label {
+      color: #777;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px
+    }
+
+    .prediction {
+      font-size: 30px;
+      font-weight: 800;
+      margin-top: 8px;
+      text-transform: capitalize
+    }
+
+    .confidence {
+      color: #8d85ff;
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 7px
+    }
+
+    .probability {
+      margin-bottom: 15px
+    }
+
+    .prob-head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 7px;
+      font-size: 13px;
+      text-transform: capitalize
+    }
+
+    .bar-bg {
+      height: 9px;
+      background: #242428;
+      border-radius: 999px;
+      overflow: hidden
+    }
+
+    .bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #6c63ff, #9b8cff);
+      border-radius: inherit;
+      transition: width .7s ease
+    }
+
+    .disclaimer {
+      margin-top: 18px;
+      color: #666;
+      font-size: 11px;
+      text-align: center;
+      line-height: 1.6
+    }
+
+    @media(max-width:700px) {
+      body {
+        padding: 15px;
+        align-items: flex-start
+      }
+
+      .card {
+        padding: 15px
+      }
+
+      .upload-area {
+        min-height: 220px
+      }
+
+      .result-grid {
+        grid-template-columns: 1fr
+      }
+
+      .prediction {
+        font-size: 26px
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="container">
-  <div class="header">
-    <div class="eyebrow">Deep Learning · EfficientNetV2B0</div>
-    <h1>Brain Tumor MRI Classifier</h1>
-    <div class="subtitle">Upload an MRI image. The model runs entirely in your browser, so your image is never uploaded anywhere.</div>
+  <div class="container">
+    <div class="header">
+      <div class="eyebrow">Deep Learning · EfficientNetV2B0</div>
+      <h1>Brain Tumor MRI Classifier</h1>
+      <div class="subtitle">Upload an MRI image. The model runs entirely in your browser, so your image is never
+        uploaded anywhere.</div>
+    </div>
+
+    <div class="card">
+      <div class="upload-area" id="uploadArea">
+        <div class="upload-content" id="uploadContent">
+          <div class="icon">MRI</div>
+          <div class="upload-title">Upload MRI Image</div>
+          <div class="upload-hint">Tap or drag &amp; drop · JPG / PNG</div>
+          <div class="file-name" id="fileName"></div>
+        </div>
+        <img id="preview" alt="MRI preview">
+        <input id="fileInput" type="file" accept="image/png,image/jpeg">
+      </div>
+
+      <div class="actions">
+        <button id="clearBtn">Clear</button>
+        <button id="predictBtn" disabled>Loading model...</button>
+      </div>
+
+      <div class="status" id="status">Loading model (about 25 MB, first visit only)...</div>
+      <div class="error" id="error"></div>
+
+      <div class="result" id="result">
+        <div class="result-grid">
+          <div class="prediction-box">
+            <div class="label">Predicted Class</div>
+            <div class="prediction" id="prediction">—</div>
+            <div class="confidence" id="confidence">—</div>
+          </div>
+          <div class="prediction-box">
+            <div class="label">Class Probabilities</div>
+            <div id="probabilities" style="margin-top:18px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="disclaimer">Research/demo tool only. Not intended for clinical diagnosis or medical decision-making.
+      </div>
+    </div>
   </div>
 
-  <div class="card">
-    <div class="upload-area" id="uploadArea">
-      <div class="upload-content" id="uploadContent">
-        <div class="icon">MRI</div>
-        <div class="upload-title">Upload MRI Image</div>
-        <div class="upload-hint">Tap or drag &amp; drop · JPG / PNG</div>
-        <div class="file-name" id="fileName"></div>
-      </div>
-      <img id="preview" alt="MRI preview">
-      <input id="fileInput" type="file" accept="image/png,image/jpeg">
-    </div>
+  <script src="ort.wasm.min.js"></script>
+  <script>
+    const MODEL_URL = "brain_mri_v2.onnx";
+    const CLASS_NAMES = ["glioma", "meningioma", "no tumor", "pituitary"];
+    const SIZE = 256;
 
-    <div class="actions">
-      <button id="clearBtn">Clear</button>
-      <button id="predictBtn" disabled>Loading model...</button>
-    </div>
+    const $ = id => document.getElementById(id);
+    const uploadArea = $("uploadArea"), uploadContent = $("uploadContent"), fileInput = $("fileInput");
+    const preview = $("preview"), fileName = $("fileName"), predictBtn = $("predictBtn"), clearBtn = $("clearBtn");
+    const statusBox = $("status"), errorBox = $("error"), result = $("result");
 
-    <div class="status" id="status">Loading model (about 25 MB, first visit only)...</div>
-    <div class="error" id="error"></div>
+    let session = null, selectedFile = null;
 
-    <div class="result" id="result">
-      <div class="result-grid">
-        <div class="prediction-box">
-          <div class="label">Predicted Class</div>
-          <div class="prediction" id="prediction">—</div>
-          <div class="confidence" id="confidence">—</div>
-        </div>
-        <div class="prediction-box">
-          <div class="label">Class Probabilities</div>
-          <div id="probabilities" style="margin-top:18px"></div>
-        </div>
-      </div>
-    </div>
+    function showError(msg) { errorBox.textContent = msg; errorBox.style.display = "block"; }
 
-    <div class="disclaimer">Research/demo tool only. Not intended for clinical diagnosis or medical decision-making.</div>
-  </div>
-</div>
+    async function loadModel() {
+      try {
+        ort.env.wasm.numThreads = 1;
+        ort.env.wasm.wasmPaths = new URL("./", location.href).href;
+        session = await ort.InferenceSession.create(MODEL_URL, { executionProviders: ["wasm"] });
+        statusBox.style.display = "none";
+        predictBtn.textContent = "Prediction";
+        predictBtn.disabled = !selectedFile;
+      } catch (e) {
+        statusBox.style.display = "none";
+        predictBtn.textContent = "Model failed";
+        showError("Could not load the model: " + e.message);
+      }
+    }
+    loadModel();
 
-<script src="ort.wasm.min.js"></script>
-<script>
-const MODEL_URL = "brain_tumor_model.onnx";
-const CLASS_NAMES = ["glioma", "meningioma", "no tumor", "pituitary"];
-const SIZE = 256;
-
-const $ = id => document.getElementById(id);
-const uploadArea = $("uploadArea"), uploadContent = $("uploadContent"), fileInput = $("fileInput");
-const preview = $("preview"), fileName = $("fileName"), predictBtn = $("predictBtn"), clearBtn = $("clearBtn");
-const statusBox = $("status"), errorBox = $("error"), result = $("result");
-
-let session = null, selectedFile = null;
-
-function showError(msg){ errorBox.textContent = msg; errorBox.style.display = "block"; }
-
-async function loadModel(){
-  try{
-    ort.env.wasm.numThreads = 1;
-    ort.env.wasm.wasmPaths = new URL("./", location.href).href;
-    session = await ort.InferenceSession.create(MODEL_URL, { executionProviders: ["wasm"] });
-    statusBox.style.display = "none";
-    predictBtn.textContent = "Prediction";
-    predictBtn.disabled = !selectedFile;
-  }catch(e){
-    statusBox.style.display = "none";
-    predictBtn.textContent = "Model failed";
-    showError("Could not load the model: " + e.message);
-  }
-}
-loadModel();
-
-uploadArea.addEventListener("click", () => fileInput.click());
-fileInput.addEventListener("change", () => { if(fileInput.files.length) setFile(fileInput.files[0]); });
-uploadArea.addEventListener("dragover", e => { e.preventDefault(); uploadArea.style.borderColor = "#7f5af0"; });
-uploadArea.addEventListener("dragleave", () => uploadArea.style.borderColor = "#3c3c43");
-uploadArea.addEventListener("drop", e => {
-  e.preventDefault(); uploadArea.style.borderColor = "#3c3c43";
-  if(e.dataTransfer.files.length) setFile(e.dataTransfer.files[0]);
-});
-
-function setFile(file){
-  if(!file.type.startsWith("image/")){ showError("Please select a valid image."); return; }
-  selectedFile = file;
-  fileName.textContent = file.name;
-  predictBtn.disabled = !session;
-  errorBox.style.display = "none";
-  result.style.display = "none";
-  const reader = new FileReader();
-  reader.onload = ev => {
-    preview.src = ev.target.result;
-    preview.style.display = "block";
-    uploadContent.style.display = "none";
-  };
-  reader.readAsDataURL(file);
-}
-
-clearBtn.addEventListener("click", () => {
-  selectedFile = null; fileInput.value = ""; preview.src = "";
-  preview.style.display = "none"; uploadContent.style.display = "block";
-  fileName.textContent = ""; predictBtn.disabled = true;
-  result.style.display = "none"; errorBox.style.display = "none";
-});
-
-async function imageToTensor(file){
-  const bitmap = await createImageBitmap(file);
-  const canvas = document.createElement("canvas");
-  canvas.width = SIZE; canvas.height = SIZE;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.fillStyle = "#000";
-  ctx.fillRect(0, 0, SIZE, SIZE);
-  ctx.drawImage(bitmap, 0, 0, SIZE, SIZE);
-  const { data } = ctx.getImageData(0, 0, SIZE, SIZE);
-  const input = new Float32Array(SIZE * SIZE);
-  for(let i = 0; i < SIZE * SIZE; i++){
-    // same grayscale formula as PIL's convert("L"); values stay in 0..255
-    input[i] = Math.round(0.299 * data[i*4] + 0.587 * data[i*4+1] + 0.114 * data[i*4+2]);
-  }
-  return new ort.Tensor("float32", input, [1, SIZE, SIZE, 1]);
-}
-
-predictBtn.addEventListener("click", async () => {
-  if(!selectedFile || !session) return;
-  predictBtn.disabled = true;
-  statusBox.textContent = "Running model inference...";
-  statusBox.style.display = "block";
-  errorBox.style.display = "none";
-  result.style.display = "none";
-
-  try{
-    const tensor = await imageToTensor(selectedFile);
-    const out = await session.run({ [session.inputNames[0]]: tensor });
-    const probs = Array.from(out[session.outputNames[0]].data);
-
-    let best = 0;
-    probs.forEach((p, i) => { if(p > probs[best]) best = i; });
-
-    $("prediction").textContent = CLASS_NAMES[best];
-    $("confidence").textContent = (probs[best] * 100).toFixed(2) + "% confidence";
-
-    const box = $("probabilities");
-    box.innerHTML = "";
-    probs.map((p, i) => [CLASS_NAMES[i], p]).sort((a, b) => b[1] - a[1]).forEach(([cls, p]) => {
-      const pct = p * 100;
-      const div = document.createElement("div");
-      div.className = "probability";
-      div.innerHTML = `<div class="prob-head"><span>${cls}</span><span>${pct.toFixed(2)}%</span></div>
-                       <div class="bar-bg"><div class="bar"></div></div>`;
-      box.appendChild(div);
-      requestAnimationFrame(() => div.querySelector(".bar").style.width = pct + "%");
+    uploadArea.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", () => { if (fileInput.files.length) setFile(fileInput.files[0]); });
+    uploadArea.addEventListener("dragover", e => { e.preventDefault(); uploadArea.style.borderColor = "#7f5af0"; });
+    uploadArea.addEventListener("dragleave", () => uploadArea.style.borderColor = "#3c3c43");
+    uploadArea.addEventListener("drop", e => {
+      e.preventDefault(); uploadArea.style.borderColor = "#3c3c43";
+      if (e.dataTransfer.files.length) setFile(e.dataTransfer.files[0]);
     });
 
-    result.style.display = "block";
-  }catch(e){
-    showError("Prediction failed: " + e.message);
-  }finally{
-    predictBtn.disabled = false;
-    statusBox.style.display = "none";
-  }
-});
-</script>
+    function setFile(file) {
+      if (!file.type.startsWith("image/")) { showError("Please select a valid image."); return; }
+      selectedFile = file;
+      fileName.textContent = file.name;
+      predictBtn.disabled = !session;
+      errorBox.style.display = "none";
+      result.style.display = "none";
+      const reader = new FileReader();
+      reader.onload = ev => {
+        preview.src = ev.target.result;
+        preview.style.display = "block";
+        uploadContent.style.display = "none";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    clearBtn.addEventListener("click", () => {
+      selectedFile = null; fileInput.value = ""; preview.src = "";
+      preview.style.display = "none"; uploadContent.style.display = "block";
+      fileName.textContent = ""; predictBtn.disabled = true;
+      result.style.display = "none"; errorBox.style.display = "none";
+    });
+
+    async function imageToTensor(file) {
+      const bitmap = await createImageBitmap(file);
+      const canvas = document.createElement("canvas");
+      canvas.width = SIZE; canvas.height = SIZE;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, SIZE, SIZE);
+      ctx.drawImage(bitmap, 0, 0, SIZE, SIZE);
+      const { data } = ctx.getImageData(0, 0, SIZE, SIZE);
+      const input = new Float32Array(SIZE * SIZE);
+      for (let i = 0; i < SIZE * SIZE; i++) {
+        // same grayscale formula as PIL's convert("L"); values stay in 0..255
+        input[i] = Math.round(0.299 * data[i * 4] + 0.587 * data[i * 4 + 1] + 0.114 * data[i * 4 + 2]);
+      }
+      return new ort.Tensor("float32", input, [1, SIZE, SIZE, 1]);
+    }
+
+    predictBtn.addEventListener("click", async () => {
+      if (!selectedFile || !session) return;
+      predictBtn.disabled = true;
+      statusBox.textContent = "Running model inference...";
+      statusBox.style.display = "block";
+      errorBox.style.display = "none";
+      result.style.display = "none";
+
+      try {
+        const tensor = await imageToTensor(selectedFile);
+        const out = await session.run({ [session.inputNames[0]]: tensor });
+        const probs = Array.from(out[session.outputNames[0]].data);
+
+        let best = 0;
+        probs.forEach((p, i) => { if (p > probs[best]) best = i; });
+
+        $("prediction").textContent = CLASS_NAMES[best];
+        $("confidence").textContent = (probs[best] * 100).toFixed(2) + "% confidence";
+
+        const box = $("probabilities");
+        box.innerHTML = "";
+        probs.map((p, i) => [CLASS_NAMES[i], p]).sort((a, b) => b[1] - a[1]).forEach(([cls, p]) => {
+          const pct = p * 100;
+          const div = document.createElement("div");
+          div.className = "probability";
+          div.innerHTML = `<div class="prob-head"><span>${cls}</span><span>${pct.toFixed(2)}%</span></div>
+                       <div class="bar-bg"><div class="bar"></div></div>`;
+          box.appendChild(div);
+          requestAnimationFrame(() => div.querySelector(".bar").style.width = pct + "%");
+        });
+
+        result.style.display = "block";
+      } catch (e) {
+        showError("Prediction failed: " + e.message);
+      } finally {
+        predictBtn.disabled = false;
+        statusBox.style.display = "none";
+      }
+    });
+  </script>
 </body>
+
 </html>
