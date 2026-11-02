@@ -96,7 +96,7 @@ button{border:0;border-radius:12px;padding:14px 20px;font-size:15px;font-weight:
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
+<script src="ort.wasm.min.js"></script>
 <script>
 const MODEL_URL = "brain_tumor_model.onnx";
 const CLASS_NAMES = ["glioma", "meningioma", "no tumor", "pituitary"];
@@ -114,6 +114,7 @@ function showError(msg){ errorBox.textContent = msg; errorBox.style.display = "b
 async function loadModel(){
   try{
     ort.env.wasm.numThreads = 1;
+    ort.env.wasm.wasmPaths = new URL("./", location.href).href;
     session = await ort.InferenceSession.create(MODEL_URL, { executionProviders: ["wasm"] });
     statusBox.style.display = "none";
     predictBtn.textContent = "Prediction";
